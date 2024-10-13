@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Analytics Dashboard</title>
+</head>
+<body>
+    <h1>Chatbot Analytics Dashboard</h1>
+    <div>
+        <h2>Total Queries: <span id="query-count"></span></h2>
+        <h2>Most Common Topics:</h2>
+        <ul id="topic-list"></ul>
+        <h2>User Satisfaction Ratings:</h2>
+        <p>Average Rating: <span id="avg-rating"></span></p>
+    </div>
+    
+    <script>
+        async function fetchAnalytics() {
+            const response = await fetch('/analytics');
+            const data = await response.json();
+
+            document.getElementById('query-count').textContent = data.query_count;
+
+            const topicList = document.getElementById('topic-list');
+            topicList.innerHTML = '';
+            for (const [topic, count] of Object.entries(data.topic_counter)) {
+                const li = document.createElement('li');
+                li.textContent = `${topic}: ${count}`;
+                topicList.appendChild(li);
+            }
+
+            const avgRating = data.user_ratings.length > 0
+                ? (data.user_ratings.reduce((a, b) => a + b) / data.user_ratings.length).toFixed(2)
+                : 'N/A';
+            document.getElementById('avg-rating').textContent = avgRating;
+        }
+
+        fetchAnalytics();
+    </script>
+</body>
+</html>
